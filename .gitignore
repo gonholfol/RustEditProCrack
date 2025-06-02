@@ -1,0 +1,30 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+bin/
+obj/
+out/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.cache
+*.vscode/
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Assembly files (target DLLs)
+Assembly-CSharp.dll
+Assembly-CSharp_Modifi.dll
+Assembly-CSharp_Patched.dll
+
+# Managed Unity dependencies
+Managed/
+
+# Temporary files
+*.tmp
+*.temp
+*.log 
