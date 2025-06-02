@@ -1,28 +1,45 @@
 # RustEditProCrack
 
-Automatic Unity assembly patcher that removes restrictions and enables PRO features.
+Автоматический патчер Unity-сборки, который удаляет ограничения и активирует PRO-функции.
 
-## Features
+## Возможности
 
-- **PRO Mode**: Auto-patches obfuscated boolean methods via `DiscordPresence.UpdateActivity`
-- **Unlock Prefabs**: Removes `File.Exists()` validation 
-- **Remove Password**: Eliminates `WorldSaveLoad` password protection
-- **Remove Blocks**: Patches `NJFSINOIPNMDA` class restrictions
+- **PRO Режим**: Автоматически патчит обфусцированные булевы методы через `DiscordPresence.UpdateActivity`
+- **Разблокировка Prefabs**: Удаляет проверку `File.Exists()` 
+- **Удаление пароля**: Устраняет защиту паролем в `WorldSaveLoad`
+- **Удаление блоков**: Патчит ограничения класса `NJFSINOIPNMDA`
 
-## Usage
+## Установка и использование
 
-1. Place `Assembly-CSharp.dll` in `Managed/` folder
-2. Build and run:
-   ```bash
-   dotnet build
-   dotnet run -- "Managed/Assembly-CSharp.dll"
-   ```
-3. Get patched `Assembly-CSharp_Modifi.dll`
-
-## Requirements
+### Требования
 
 - .NET 6.0+
 - Unity `Assembly-CSharp.dll`
+
+### Шаг 1: Находим Assembly-CSharp.dll
+
+1. Зайдите в папку, где установлен RustEdit
+2. Найдите папку `rustedit_data`
+
+![Шаг 1](image/1.png)
+
+3. В этой папке найдите папку `Managed` и скопируйте её в проект
+
+![Шаг 2](image/2.png)
+
+### Шаг 2: Компиляция и запуск
+
+1. Соберите проект командой:
+   ```bash
+   dotnet build
+   ```
+
+2. Запустите патчер с указанием пути к DLL:
+   ```bash
+   dotnet run -- "Managed/Assembly-CSharp.dll"
+   ```
+
+3. Получите патченный файл `Assembly-CSharp_Modifi.dll`
 
 ### Установка .NET с помощью dotnet-install.sh
 
@@ -42,11 +59,11 @@ export PATH=$HOME/.dotnet:$PATH
 dotnet --version
 ```
 
-## How it works
+## Как это работает
 
-1. Finds obfuscated PRO class via "512_2" string in `DiscordPresence.UpdateActivity`
-2. Patches boolean method to always return `true`
-3. Removes file validation and password checks
-4. Replaces blocking instructions with `NOP`
+1. Находит обфусцированный PRO-класс через строку "512_2" в `DiscordPresence.UpdateActivity`
+2. Патчит булев метод, чтобы он всегда возвращал `true`
+3. Удаляет проверку файлов и проверки паролей
+4. Заменяет блокирующие инструкции на `NOP`
 
-**Output**: Fully unlocked Unity assembly with all restrictions removed. 
+**Результат**: Полностью разблокированная сборка Unity со всеми удалёнными ограничениями. 
