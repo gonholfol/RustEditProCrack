@@ -26,17 +26,23 @@ namespace RustEditProCrack.Unlockers
             
             try
             {
-                // Найти класс PLOFBHPMKFD, который содержит методы шифрования
+                // ОБНОВЛЕНО: Ищем новое имя класса BFJKBOOACKO вместо старого PLOFBHPMKFD
                 var cryptoClass = assembly.MainModule.Types
-                    .FirstOrDefault(t => t.Name == "PLOFBHPMKFD");
+                    .FirstOrDefault(t => t.Name == "BFJKBOOACKO");
                     
                 if (cryptoClass == null)
                 {
-                    Console.WriteLine("❌ PLOFBHPMKFD класс не найден");
-                    return false;
+                    // Пытаемся найти с помощью характеристик, если имя снова изменилось
+                    cryptoClass = FindCryptoClassBySignature();
+                    
+                    if (cryptoClass == null)
+                    {
+                        Console.WriteLine("❌ Класс шифрования не найден");
+                        return false;
+                    }
                 }
 
-                Console.WriteLine($"✅ Найден класс PLOFBHPMKFD с {cryptoClass.Methods.Count} методами");
+                Console.WriteLine($"✅ Найден класс {cryptoClass.Name} с {cryptoClass.Methods.Count} методами");
 
                 // Найти все методы шифрования/дешифрования (по характерным признакам)
                 var encryptionMethods = cryptoClass.Methods
@@ -78,6 +84,47 @@ namespace RustEditProCrack.Unlockers
                 Console.WriteLine($"❌ Ошибка удаления password protection: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Находит класс шифрования по сигнатурам методов
+        /// </summary>
+        private TypeDefinition FindCryptoClassBySignature()
+        {
+            Console.WriteLine("🔍 Ищем класс шифрования по сигнатурам...");
+            
+            foreach (var type in assembly.MainModule.Types)
+            {
+                // Проверяем, есть ли у класса методы с характерными признаками шифрования
+                var encryptionMethods = type.Methods
+                    .Where(m => m.HasBody && m.ReturnType.FullName == "System.String" && 
+                           m.Parameters.Count == 2 && 
+                           m.Parameters[0].ParameterType.FullName == "System.String" && 
+                           m.Parameters[1].ParameterType.FullName == "System.Int32")
+                    .ToList();
+                
+                if (encryptionMethods.Count >= 3)
+                {
+                    // Проверяем, есть ли в методах использование классов шифрования
+                    foreach (var method in encryptionMethods)
+                    {
+                        bool containsCrypto = method.Body.Instructions
+                            .Any(i => i.OpCode == OpCodes.Newobj && 
+                                  i.Operand is MethodReference methodRef && 
+                                  (methodRef.DeclaringType.Name.Contains("Aes") || 
+                                   methodRef.DeclaringType.Name.Contains("Rfc2898DeriveBytes") ||
+                                   methodRef.DeclaringType.Name.Contains("CryptoStream")));
+                        
+                        if (containsCrypto)
+                        {
+                            Console.WriteLine($"🔍 Найден вероятный класс шифрования: {type.Name}");
+                            return type;
+                        }
+                    }
+                }
+            }
+            
+            return null;
         }
 
         /// <summary>
